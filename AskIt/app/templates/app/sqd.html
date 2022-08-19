@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+ 
+{% block title %}
+SQD
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <!-- <h1>{{ques.id}}</h1> -->
+    {% if messages %}
+    <ul class="messages3">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}{% endif %}{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+   <h1 style="text-align: center;">{{ques.title}}</h1> 
+   <div class="ans-btn-box" style="text-align: center;">
+    <button class="btn btn-primary" onclick="showans();">Add Answer</button>
+   </div>
+   <div class="ans-added" style="text-align: center;">
+    <!-- <p>Add a answer</p>  -->
+    <form action="{% url 'ansadd' ques.id %}" method="post">
+        {% csrf_token %}
+        <!-- <textarea name="answerbox" id="" cols="90" rows="5" required></textarea> -->
+        {{ansfield.media}}
+        {{ansfield.as_p}}
+        <button type="submit" class="btn btn-primary">Add</button>
+    </form>
+   </div>
+    <br> <br>
+
+
+    {{mess}}
+    
+    {% for sing in ans %}
+        <div class="q" style="margin: 3% 3%;">
+            <div class="ans-boxxx" style="width:80%;margin: auto">
+                <div style="margin-left: 4%;text-shadow: 2px 1px white;font-size: 1.2rem;"><a href="{% url 'profile' sing.ans_askedby.id %}" style="text-decoration: none;color: black;">@{{sing.ans_askedby}}</a>
+                </div>
+            <div class="p">
+                <div  style="color: rgba(0, 0, 0, 0.596);font-size: 1rem;font-weight: 400;">Answered {{sing.created}}</div>
+                <div class="ans">{{sing.ans|safe}}</div> 
+                <div class="edit-box" style="display:flex;">
+                    {% if request.user == sing.ans_askedby %}
+                        <form action="{% url 'editans' ques.id sing.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary" style="margin:15px 15px;">Edit</button>
+                        </form>
+                        <form action="{% url 'deleteans' ques.id sing.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger" style="margin:15px 15px;">Delete</button>
+                        </form>
+                        {% endif %}
+                        <form action="{% url 'display_ans' ques.id sing.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary" style="margin:15px 15px;">Comments</button>
+                        </form>
+                    </div> 
+            </div>
+
+            
+
+        </div>
+        </div>
+    {% endfor %}
+
+    </div>
+    <script>
+        document.querySelector('.messages3').style.listStyle = "none";
+        document.querySelector('.messages3').style.cursor = "pointer";
+        const t = document.querySelector('.messages3');
+        t.onclick = ()=>{
+            t.style.display = "none";
+        }
+    </script>
+
+{% endblock %}
